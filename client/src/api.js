@@ -1,4 +1,6 @@
-const API_BASE = '/api';
+const API_BASE = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+  ? 'http://127.0.0.1:5000/api'
+  : '/api';
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('brightloop_token');
