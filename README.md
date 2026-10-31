@@ -18,21 +18,42 @@ Brightloop is a high-performance, unified subscription management and billing pl
 
 ---
 
-## Seeded Demo Credentials
+## Login Credentials & Seeded Accounts
 
-| Role | Email | Password | Name & Organization | Access Scope |
+All accounts are pre-seeded in the database and ready for instant login at [http://localhost:3000](http://localhost:3000):
+
+### 1. Administrative Console Access (`Admin`)
+Full system configuration, staff management, product catalog, tax rules, and batch billing execution.
+
+| Name | Email | Password | Organization | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| **Admin** | `admin@brightloop.io` | `BrightAdmin2026!` | Elena Vance (Brightloop Software) | Full administrative console, staff management, catalog, taxes, billing runs |
-| **Admin** | `david.chen@brightloop.io` | `BrightAdmin2026!` | David Chen (Brightloop Software) | Executive financial dashboards and system governance |
-| **Internal Staff** | `staff@brightloop.io` | `BrightStaff2026!` | Marcus Reed (Billing Operations) | Operations console, quotes, subscriptions, invoices, payment capture |
-| **Internal Staff** | `chloe.adams@brightloop.io` | `BrightStaff2026!` | Chloe Adams (Enterprise AE) | Quotation templates, contract renewals, customer provisioning |
-| **Customer (TechCorp)** | `sarah@techcorp.com` | `CustomerPass2026!` | Sarah Jenkins (TechCorp Global) | Self-service portal: subscriptions, pause/resume, invoice settlement |
-| **Customer (Odoo Edition)** | `john@urbanretail.com` | `CustomerPass2026!` | John Davis (Urban Retailers Ltd) | Portal access for Urban Retailers Odoo-integrated subscription |
-| **Customer (Logistics)** | `emily.watson@apexlogistics.com` | `CustomerPass2026!` | Emily Watson (Apex Freight) | High-volume multi-region freight tracking cluster |
-| **Customer (FinTech)** | `robert.kim@fintechpulse.io` | `CustomerPass2026!` | Robert Kim (FinTech Pulse) | Regulatory SaaS deployment with hardware 2FA keys |
-| **Customer (Consulting)** | `clara.moreau@lyonconsulting.eu` | `CustomerPass2026!` | Clara Moreau (Lyon Advisory) | European Union consulting deployment (paused lifecycle demo) |
-| **Customer (Clean Energy)** | `sam.okonkwo@saharaenergy.org` | `CustomerPass2026!` | Samuel Okonkwo (Sahara Clean Power) | Annual renewable grid monitoring contract |
-| **Customer (Healthcare)** | `priya.nair@vertexhealth.com` | `CustomerPass2026!` | Dr. Priya Nair (Vertex Health) | HIPAA analytics cluster (draft stage quote) |
+| **Elena Vance** | `admin@brightloop.io` | `BrightAdmin2026!` | Brightloop Software Inc. | Primary Chief Operating Officer & System Admin |
+| **David Chen** | `david.chen@brightloop.io` | `BrightAdmin2026!` | Brightloop Software Inc. | VP of Finance & Executive Reporting |
+
+### 2. Operations & Sales Staff Access (`Staff`)
+Daily operational workflow: quotation generation, subscription management, and payment reconciliation.
+
+| Name | Email | Password | Organization | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **Marcus Reed** | `staff@brightloop.io` | `BrightStaff2026!` | Brightloop Software Inc. | Lead Billing Operations Specialist |
+| **Chloe Adams** | `chloe.adams@brightloop.io` | `BrightStaff2026!` | Brightloop Software Inc. | Enterprise Account Executive |
+| **Liam Patel** | `liam.patel@brightloop.io` | `BrightStaff2026!` | Brightloop Software Inc. | Customer Success & Onboarding Lead |
+
+### 3. Customer Self-Service Portal Access (`Customer`)
+Isolated customer portal for viewing active subscriptions, pausing/resuming services, downloading statements, and settling invoices online.
+
+| Customer Name | Company / Organization | Email | Password | Subscription Scenario |
+| :--- | :--- | :--- | :--- | :--- |
+| **Sarah Jenkins** | TechCorp Global Solutions | `sarah@techcorp.com` | `CustomerPass2026!` | Active Monthly subscription & paid invoices |
+| **John Davis** | Urban Retailers Ltd | `john@urbanretail.com` | `CustomerPass2026!` | Active Yearly subscription with **Odoo Variant (+$560.00)** & overdue invoice |
+| **Alex Rivera** | QuickStart Studio | `alex@quickstart.co` | `CustomerPass2026!` | Pending sandbox quotation awaiting customer approval |
+| **Emily Watson** | Apex Freight & Logistics | `emily.watson@apexlogistics.com` | `CustomerPass2026!` | Active Enterprise Custom cluster with partial payment |
+| **Robert Kim** | FinTech Pulse Technologies | `robert.kim@fintechpulse.io` | `CustomerPass2026!` | Regulatory SaaS deployment with hardware 2FA tokens & Stripe payment |
+| **Clara Moreau** | Lyon Advisory Group | `clara.moreau@lyonconsulting.eu` | `CustomerPass2026!` | Paused subscription lifecycle demo with EU digital tax (10%) |
+| **Samuel Okonkwo** | Sahara Clean Power | `sam.okonkwo@saharaenergy.org` | `CustomerPass2026!` | Annual renewable grid monitoring contract settled via SWIFT wire |
+| **Dr. Priya Nair** | Vertex Health Analytics | `priya.nair@vertexhealth.com` | `CustomerPass2026!` | Draft stage HIPAA-compliant analytics quote |
+| **Hannah Schmidt** | Nordic Cloud Systems GmbH | `hannah.schmidt@nordiccloud.de` | `CustomerPass2026!` | Active weekly dev sprint with invoice due soon |
+| **Carlos Mendoza** | LatAm Commerce Hub | `carlos.mendoza@latamgrowth.com` | `CustomerPass2026!` | Closed subscription showing term completion policy |
 
 > [!NOTE]
 > All passwords strictly enforce the system security policy: minimum 9 characters, at least one uppercase letter, one lowercase letter, one digit, and one special character (`!@#$%^&*`).
