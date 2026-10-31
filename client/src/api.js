@@ -2,9 +2,10 @@ const API_BASE = '/api';
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('brightloop_token');
+  const validToken = (token && token !== 'undefined') ? token : null;
   const headers = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(validToken ? { Authorization: `Bearer ${validToken}` } : {}),
     ...(options.headers || {})
   };
 

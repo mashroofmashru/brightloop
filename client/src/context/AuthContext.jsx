@@ -5,10 +5,21 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('brightloop_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('brightloop_user');
+      if (saved && saved !== 'undefined') {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      localStorage.removeItem('brightloop_user');
+    }
+    return null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('brightloop_token') || null);
+
+  const [token, setToken] = useState(() => {
+    const saved = localStorage.getItem('brightloop_token');
+    return (saved && saved !== 'undefined') ? saved : null;
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
