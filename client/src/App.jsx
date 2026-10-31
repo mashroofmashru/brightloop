@@ -12,6 +12,8 @@ import StaffPage from './pages/StaffPage';
 import ProductsPlansPage from './pages/ProductsPlansPage';
 import QuotationTemplatesPage from './pages/QuotationTemplatesPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
+import InvoicesPage from './pages/InvoicesPage';
+import TaxesDiscountsPage from './pages/TaxesDiscountsPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
 import { tokens } from './theme';
 
@@ -90,6 +92,11 @@ export default function App() {
             onClearInitialTemplate={() => setTemplateToUse(null)}
           />
         );
+      case 'invoices':
+        return <InvoicesPage />;
+      case 'discounts':
+      case 'taxes':
+        return <TaxesDiscountsPage />;
       case 'dashboard':
       default:
         return <DashboardPage onNavigate={setConsoleView} />;
