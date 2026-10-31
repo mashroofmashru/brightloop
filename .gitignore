@@ -4,3 +4,8 @@ build/
 .env
 *.log
 .DS_Store
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
