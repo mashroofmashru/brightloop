@@ -165,3 +165,18 @@ export const invoicesApi = {
     method: 'POST'
   })
 };
+
+export const paymentsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiRequest(`/payments${query ? `?${query}` : ''}`);
+  },
+  record: (data) => apiRequest('/payments', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+};
+
+export const analyticsApi = {
+  getDashboard: () => apiRequest('/analytics/dashboard')
+};
