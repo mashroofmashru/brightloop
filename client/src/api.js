@@ -119,3 +119,49 @@ export const subscriptionsApi = {
     body: JSON.stringify(data)
   })
 };
+
+export const taxesApi = {
+  getAll: () => apiRequest('/taxes'),
+  create: (data) => apiRequest('/taxes', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  update: (id, data) => apiRequest(`/taxes/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
+};
+
+export const discountsApi = {
+  getAll: () => apiRequest('/discounts'),
+  create: (data) => apiRequest('/discounts', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  update: (id, data) => apiRequest(`/discounts/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  }),
+  delete: (id) => apiRequest(`/discounts/${id}`, {
+    method: 'DELETE'
+  })
+};
+
+export const invoicesApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiRequest(`/invoices${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => apiRequest(`/invoices/${id}`),
+  runBilling: (data = {}) => apiRequest('/invoices/run-billing', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  updateStatus: (id, data) => apiRequest(`/invoices/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  }),
+  send: (id) => apiRequest(`/invoices/${id}/send`, {
+    method: 'POST'
+  })
+};
