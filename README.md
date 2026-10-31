@@ -25,19 +25,16 @@ All accounts are pre-seeded in the database and ready for instant login at [http
 ### 1. Administrative Console Access (`Admin`)
 Full system configuration, staff management, product catalog, tax rules, and batch billing execution.
 
-| Name | Email | Password | Organization | Description |
+| Role | Email | Password | Name | Access Level |
 | :--- | :--- | :--- | :--- | :--- |
-| **Elena Vance** | `admin@brightloop.io` | `BrightAdmin2026!` | Brightloop Software Inc. | Primary Chief Operating Officer & System Admin |
-| **David Chen** | `david.chen@brightloop.io` | `BrightAdmin2026!` | Brightloop Software Inc. | VP of Finance & Executive Reporting |
+| **Admin** | `admin@brightloop.io` | `BrightAdmin2026!` | Elena Vance (Admin) | Full system administrative console & executive analytics |
 
 ### 2. Operations & Sales Staff Access (`Staff`)
 Daily operational workflow: quotation generation, subscription management, and payment reconciliation.
 
-| Name | Email | Password | Organization | Description |
+| Role | Email | Password | Name | Access Level |
 | :--- | :--- | :--- | :--- | :--- |
-| **Marcus Reed** | `staff@brightloop.io` | `BrightStaff2026!` | Brightloop Software Inc. | Lead Billing Operations Specialist |
-| **Chloe Adams** | `chloe.adams@brightloop.io` | `BrightStaff2026!` | Brightloop Software Inc. | Enterprise Account Executive |
-| **Liam Patel** | `liam.patel@brightloop.io` | `BrightStaff2026!` | Brightloop Software Inc. | Customer Success & Onboarding Lead |
+| **Internal Staff** | `staff@brightloop.io` | `BrightStaff2026!` | Marcus Reed (Operations) | Quotations, subscriptions, billing runs & invoice reconciliation |
 
 ### 3. Customer Self-Service Portal Access (`Customer`)
 Isolated customer portal for viewing active subscriptions, pausing/resuming services, downloading statements, and settling invoices online.

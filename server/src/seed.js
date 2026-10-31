@@ -54,9 +54,9 @@ export async function seedDatabase(forceClean = true) {
     VALUES (?, ?, ?, ?, ?, ?)
   `);
 
-  // Admins
+  // Admin (Exactly 1 Admin)
   const admin1Id = insertUser.run(
-    'Elena Vance (COO & Admin)',
+    'Elena Vance (Admin)',
     'admin@brightloop.io',
     adminPass,
     'admin',
@@ -64,41 +64,14 @@ export async function seedDatabase(forceClean = true) {
     '+1 (555) 019-2831'
   ).lastInsertRowid;
 
-  const admin2Id = insertUser.run(
-    'David Chen (VP Finance)',
-    'david.chen@brightloop.io',
-    adminPass,
-    'admin',
-    'Brightloop Software Inc.',
-    '+1 (555) 019-2839'
-  ).lastInsertRowid;
-
-  // Staff (Sales & Operations)
+  // Staff (Exactly 1 Staff)
   const staff1Id = insertUser.run(
-    'Marcus Reed (Billing Ops)',
+    'Marcus Reed (Operations)',
     'staff@brightloop.io',
     staffPass,
     'staff',
     'Brightloop Software Inc.',
     '+1 (555) 019-2832'
-  ).lastInsertRowid;
-
-  const staff2Id = insertUser.run(
-    'Chloe Adams (Enterprise AE)',
-    'chloe.adams@brightloop.io',
-    staffPass,
-    'staff',
-    'Brightloop Software Inc.',
-    '+1 (555) 019-2833'
-  ).lastInsertRowid;
-
-  const staff3Id = insertUser.run(
-    'Liam Patel (Customer Success)',
-    'liam.patel@brightloop.io',
-    staffPass,
-    'staff',
-    'Brightloop Software Inc.',
-    '+1 (555) 019-2834'
   ).lastInsertRowid;
 
   // Customers (Various Industries & Geographies)
@@ -192,7 +165,7 @@ export async function seedDatabase(forceClean = true) {
     '+52 55 5345 2000'
   ).lastInsertRowid;
 
-  console.log('✅ Seeded 15 Users (2 Admins, 3 Staff, 10 Customers)');
+  console.log('✅ Seeded 12 Users (1 Admin, 1 Staff, 10 Customers)');
 
   // -------------------------------------------------------------------------
   // 2. Seed Products & Variants
