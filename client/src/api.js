@@ -1,10 +1,13 @@
-const API_BASE = '/api';
+const API_BASE = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+  ? 'http://127.0.0.1:5000/api'
+  : '/api';
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('brightloop_token');
+  const validToken = (token && token !== 'undefined') ? token : null;
   const headers = {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(validToken ? { Authorization: `Bearer ${validToken}` } : {}),
     ...(options.headers || {})
   };
 
@@ -52,4 +55,39 @@ export const usersApi = {
     body: JSON.stringify(staffData)
   }),
   getCustomers: () => apiRequest('/users/customers')
+};
+
+export const productsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiRequest(`/products${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => apiRequest(`/products/${id}`),
+  create: (data) => apiRequest('/products', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  update: (id, data) => apiRequest(`/products/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  }),
+  delete: (id) => apiRequest(`/products/${id}`, {
+    method: 'DELETE'
+  })
+};
+
+export const plansApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiRequest(`/plans${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => apiRequest(`/plans/${id}`),
+  create: (data) => apiRequest('/plans', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  update: (id, data) => apiRequest(`/plans/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
 };

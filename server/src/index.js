@@ -4,6 +4,8 @@ import { initDb } from './db.js';
 import { seedDatabase } from './seed.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
+import productRoutes from './routes/products.js';
+import planRoutes from './routes/plans.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +21,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/plans', planRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -9,6 +9,7 @@ import ConsoleShell from './components/layout/ConsoleShell';
 import PortalShell from './components/layout/PortalShell';
 import DashboardPage from './pages/DashboardPage';
 import StaffPage from './pages/StaffPage';
+import ProductsPlansPage from './pages/ProductsPlansPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
 import { tokens } from './theme';
 
@@ -68,6 +69,8 @@ export default function App() {
     switch (consoleView) {
       case 'staff':
         return isAdmin ? <StaffPage /> : <DashboardPage onNavigate={setConsoleView} />;
+      case 'products':
+        return <ProductsPlansPage />;
       case 'dashboard':
       default:
         return <DashboardPage onNavigate={setConsoleView} />;
