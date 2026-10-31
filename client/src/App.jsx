@@ -13,7 +13,9 @@ import ProductsPlansPage from './pages/ProductsPlansPage';
 import QuotationTemplatesPage from './pages/QuotationTemplatesPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import InvoicesPage from './pages/InvoicesPage';
+import PaymentsPage from './pages/PaymentsPage';
 import TaxesDiscountsPage from './pages/TaxesDiscountsPage';
+import ReportsPage from './pages/ReportsPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
 import { tokens } from './theme';
 
@@ -94,9 +96,13 @@ export default function App() {
         );
       case 'invoices':
         return <InvoicesPage />;
+      case 'payments':
+        return <PaymentsPage />;
       case 'discounts':
       case 'taxes':
         return <TaxesDiscountsPage />;
+      case 'reports':
+        return <ReportsPage />;
       case 'dashboard':
       default:
         return <DashboardPage onNavigate={setConsoleView} />;

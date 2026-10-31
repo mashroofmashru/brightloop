@@ -11,6 +11,8 @@ import subscriptionRoutes from './routes/subscriptions.js';
 import taxRoutes from './routes/taxes.js';
 import discountRoutes from './routes/discounts.js';
 import invoiceRoutes from './routes/invoices.js';
+import paymentRoutes from './routes/payments.js';
+import analyticsRoutes from './routes/analytics.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,6 +35,8 @@ app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/taxes', taxRoutes);
 app.use('/api/discounts', discountRoutes);
 app.use('/api/invoices', invoiceRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

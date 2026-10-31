@@ -8,7 +8,7 @@
     "seed": "node server/src/seed.js",
     "client": "npm --prefix client run dev",
     "build": "npm --prefix client run build",
-    "test": "node server/tests/auth.test.js && node server/tests/products_plans.test.js && node server/tests/subscriptions.test.js && node server/tests/billing_invoices.test.js"
+    "test": "node server/tests/auth.test.js && node server/tests/products_plans.test.js && node server/tests/subscriptions.test.js && node server/tests/billing_invoices.test.js && node server/tests/payments_analytics.test.js"
   },
   "keywords": [],
   "author": "",

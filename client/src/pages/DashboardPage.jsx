@@ -1,44 +1,58 @@
-import React from 'react';
-import { Box, Card, CardContent, Typography, Grid, Button, Stack, Chip } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Card, CardContent, Typography, Grid, Button, Stack, Chip, CircularProgress } from '@mui/material';
 import {
   RefreshCw, TrendingUp, AlertCircle, Receipt, ArrowUpRight,
-  ShieldCheck, Briefcase, Plus, Play, Sparkles
+  ShieldCheck, Briefcase, Plus, Play, Sparkles, BarChart3
 } from 'lucide-react';
+import { analyticsApi } from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 import { tokens } from '../theme';
 
 export default function DashboardPage({ onNavigate }) {
   const { user, isAdmin, isStaff } = useAuth();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    analyticsApi.getDashboard()
+      .then(res => setData(res))
+      .catch(err => console.error('Dashboard analytics error:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const kpis = [
     {
       label: 'Active Subscriptions',
-      value: '2',
-      delta: '+12% from last month',
+      value: data?.kpis?.active_subscriptions || '2',
+      delta: `Run Rate: $${Number(data?.kpis?.mrr_estimate || 0).toFixed(2)}`,
       icon: RefreshCw,
-      color: tokens.status.success.text
+      color: tokens.status.success.text,
+      targetView: 'subscriptions'
     },
     {
-      label: 'Billed Revenue (MTD)',
-      value: '$3,806.50',
-      delta: 'Target: $5,000.00',
+      label: 'Collected Cash (Revenue)',
+      value: `$${Number(data?.kpis?.total_collected || 0).toFixed(2)}`,
+      delta: `Total Billed: $${Number(data?.kpis?.total_billed || 0).toFixed(2)}`,
       icon: TrendingUp,
-      color: tokens.accent
+      color: tokens.accent,
+      targetView: 'payments'
     },
     {
-      label: 'Outstanding Balance',
-      value: '$2,024.00',
-      delta: '1 invoice pending',
+      label: 'Outstanding Balance (A/R)',
+      value: `$${Number(data?.kpis?.outstanding_balance || 0).toFixed(2)}`,
+      delta: 'Receivables due',
       icon: Receipt,
-      color: tokens.status.warning.text
+      color: tokens.status.warning.text,
+      targetView: 'invoices'
     },
     {
       label: 'Overdue Invoices',
-      value: '1',
-      delta: 'Chasing required',
+      value: data?.kpis?.overdue_invoices_count || '0',
+      delta: `$${Number(data?.kpis?.overdue_invoices_amount || 0).toFixed(2)} to chase`,
       icon: AlertCircle,
-      color: tokens.status.danger.text
+      color: tokens.status.danger.text,
+      targetView: 'reports'
     }
   ];
 
@@ -59,16 +73,23 @@ export default function DashboardPage({ onNavigate }) {
         </Box>
 
         <Stack direction="row" spacing={1.5}>
-          {isAdmin && (
-            <Button
-              variant="outlined"
-              onClick={() => onNavigate('staff')}
-              startIcon={<ShieldCheck size={16} />}
-              sx={{ borderColor: tokens.line, color: tokens.ink }}
-            >
-              Staff Permissions
-            </Button>
-          )}
+          <Button
+            variant="outlined"
+            onClick={() => onNavigate('reports')}
+            startIcon={<BarChart3 size={16} />}
+            sx={{ borderColor: tokens.line, color: tokens.ink }}
+          >
+            Finance Reports
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => onNavigate('invoices')}
+            startIcon={<Play size={16} />}
+            sx={{ backgroundColor: tokens.accent, '&:hover': { backgroundColor: tokens.accent600 } }}
+          >
+            Billing Day Runner
+          </Button>
         </Stack>
       </Box>
 
@@ -78,23 +99,23 @@ export default function DashboardPage({ onNavigate }) {
           const Icon = kpi.icon;
           return (
             <Grid item xs={12} sm={6} md={3} key={idx}>
-              <Card sx={{ border: `1px solid ${tokens.line}`, borderRadius: '12px', height: '100%' }}>
+              <Card
+                onClick={() => onNavigate(kpi.targetView)}
+                sx={{
+                  border: `1px solid ${tokens.line}`,
+                  borderRadius: '12px',
+                  height: '100%',
+                  cursor: 'pointer',
+                  transition: 'border-color 0.15s ease',
+                  '&:hover': { borderColor: tokens.ink }
+                }}
+              >
                 <CardContent sx={{ p: 2.5 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                     <Typography variant="body2" sx={{ color: tokens.muted, fontSize: '13px', fontWeight: 500 }}>
                       {kpi.label}
                     </Typography>
-                    <Box
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: '8px',
-                        backgroundColor: tokens.canvas,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
+                    <Box sx={{ width: 32, height: 32, borderRadius: '8px', backgroundColor: tokens.canvas, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Icon size={16} color={kpi.color} />
                     </Box>
                   </Box>
@@ -117,64 +138,68 @@ export default function DashboardPage({ onNavigate }) {
         })}
       </Grid>
 
-      {/* Feature Readiness & Operations Quick Launch */}
-      <Card sx={{ border: `1px solid ${tokens.line}`, borderRadius: '12px', mb: 4 }}>
-        <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Box>
-              <Typography variant="h3" sx={{ fontSize: '18px', fontWeight: 700, mb: 0.5 }}>
-                System Status & Phase Architecture
-              </Typography>
-              <Typography variant="body2" sx={{ color: tokens.muted }}>
-                Foundation & Role-Based Authentication is fully operational.
-              </Typography>
-            </Box>
-            <Chip
-              label="Phase 1 Active"
-              size="small"
-              sx={{
-                backgroundColor: tokens.status.success.tint,
-                color: tokens.status.success.text,
-                fontWeight: 600,
-                fontSize: '12px'
-              }}
-            />
-          </Box>
+      {/* Quick Operations Launch Grid */}
+      <Grid container spacing={2.5}>
+        <Grid item xs={12} md={4}>
+          <Card
+            onClick={() => onNavigate('subscriptions')}
+            sx={{
+              p: 3,
+              borderRadius: '12px',
+              border: `1px solid ${tokens.line}`,
+              cursor: 'pointer',
+              '&:hover': { borderColor: tokens.accent }
+            }}
+          >
+            <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 700, mb: 0.5 }}>
+              ⚡ Subscriptions & Quotes
+            </Typography>
+            <Typography variant="body2" sx={{ color: tokens.muted, fontSize: '13px' }}>
+              Create new offers, advance stage pipeline, and track active contracts.
+            </Typography>
+          </Card>
+        </Grid>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <Box sx={{ p: 2, borderRadius: '8px', backgroundColor: tokens.canvas, border: `1px solid ${tokens.line}` }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                  🔐 Strict Password Enforcement
-                </Typography>
-                <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>
-                  Live rules checklist (&gt;8 chars, uppercase, lowercase, special char) and duplicate email protection.
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Box sx={{ p: 2, borderRadius: '8px', backgroundColor: tokens.canvas, border: `1px solid ${tokens.line}` }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                  👥 Three-Tier RBAC Architecture
-                </Typography>
-                <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>
-                  Admin (system controller), Internal Staff (day-to-day operations), and Customer (isolated portal).
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Box sx={{ p: 2, borderRadius: '8px', backgroundColor: tokens.canvas, border: `1px solid ${tokens.line}` }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                  ⚡ High-Performance SQLite
-                </Typography>
-                <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>
-                  WAL-mode ACID relational schema, seeded with Brightloop plans, Odoo variant (+560), and subscriptions.
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+        <Grid item xs={12} md={4}>
+          <Card
+            onClick={() => onNavigate('payments')}
+            sx={{
+              p: 3,
+              borderRadius: '12px',
+              border: `1px solid ${tokens.line}`,
+              cursor: 'pointer',
+              '&:hover': { borderColor: tokens.accent }
+            }}
+          >
+            <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 700, mb: 0.5 }}>
+              💳 Record Incoming Payment
+            </Typography>
+            <Typography variant="body2" sx={{ color: tokens.muted, fontSize: '13px' }}>
+              Reconcile wires, credit cards, or checks directly against invoices.
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={4}>
+          <Card
+            onClick={() => onNavigate('products')}
+            sx={{
+              p: 3,
+              borderRadius: '12px',
+              border: `1px solid ${tokens.line}`,
+              cursor: 'pointer',
+              '&:hover': { borderColor: tokens.accent }
+            }}
+          >
+            <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 700, mb: 0.5 }}>
+              📦 Products & Plan Builder
+            </Typography>
+            <Typography variant="body2" sx={{ color: tokens.muted, fontSize: '13px' }}>
+              Add software items, brand variant pricing (+560 Odoo), and billing cadences.
+            </Typography>
+          </Card>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
