@@ -10,6 +10,8 @@ import PortalShell from './components/layout/PortalShell';
 import DashboardPage from './pages/DashboardPage';
 import StaffPage from './pages/StaffPage';
 import ProductsPlansPage from './pages/ProductsPlansPage';
+import QuotationTemplatesPage from './pages/QuotationTemplatesPage';
+import SubscriptionsPage from './pages/SubscriptionsPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
 import { tokens } from './theme';
 
@@ -18,6 +20,7 @@ export default function App() {
   const [authView, setAuthView] = useState('login');
   const [resetToken, setResetToken] = useState('');
   const [consoleView, setConsoleView] = useState('dashboard');
+  const [templateToUse, setTemplateToUse] = useState(null);
 
   if (loading) {
     return (
@@ -71,6 +74,22 @@ export default function App() {
         return isAdmin ? <StaffPage /> : <DashboardPage onNavigate={setConsoleView} />;
       case 'products':
         return <ProductsPlansPage />;
+      case 'templates':
+        return (
+          <QuotationTemplatesPage
+            onUseTemplate={(tmpl) => {
+              setTemplateToUse(tmpl);
+              setConsoleView('subscriptions');
+            }}
+          />
+        );
+      case 'subscriptions':
+        return (
+          <SubscriptionsPage
+            initialTemplate={templateToUse}
+            onClearInitialTemplate={() => setTemplateToUse(null)}
+          />
+        );
       case 'dashboard':
       default:
         return <DashboardPage onNavigate={setConsoleView} />;

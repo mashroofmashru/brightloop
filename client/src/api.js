@@ -91,3 +91,31 @@ export const plansApi = {
     body: JSON.stringify(data)
   })
 };
+
+export const templatesApi = {
+  getAll: () => apiRequest('/templates'),
+  getById: (id) => apiRequest(`/templates/${id}`),
+  create: (data) => apiRequest('/templates', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  delete: (id) => apiRequest(`/templates/${id}`, {
+    method: 'DELETE'
+  })
+};
+
+export const subscriptionsApi = {
+  getAll: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiRequest(`/subscriptions${query ? `?${query}` : ''}`);
+  },
+  getById: (id) => apiRequest(`/subscriptions/${id}`),
+  create: (data) => apiRequest('/subscriptions', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  updateStatus: (id, data) => apiRequest(`/subscriptions/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  })
+};
