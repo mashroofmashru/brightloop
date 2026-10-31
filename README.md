@@ -20,12 +20,19 @@ Brightloop is a high-performance, unified subscription management and billing pl
 
 ## Seeded Demo Credentials
 
-| Role | Email | Password | Access Scope |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@brightloop.io` | `BrightAdmin2026!` | Full administrative console, staff management, catalog, taxes, billing runs |
-| **Internal Staff** | `staff@brightloop.io` | `BrightStaff2026!` | Operations console, quotes, subscriptions, invoices, payment capture |
-| **Customer** | `sarah@techcorp.com` | `CustomerPass2026!` | Self-service portal: subscriptions, pause/resume, invoice settlement |
-| **Customer (Odoo)** | `john@urbanretail.com` | `CustomerPass2026!` | Portal access for Urban Retailers Odoo-integrated subscription |
+| Role | Email | Password | Name & Organization | Access Scope |
+| :--- | :--- | :--- | :--- | :--- |
+| **Admin** | `admin@brightloop.io` | `BrightAdmin2026!` | Elena Vance (Brightloop Software) | Full administrative console, staff management, catalog, taxes, billing runs |
+| **Admin** | `david.chen@brightloop.io` | `BrightAdmin2026!` | David Chen (Brightloop Software) | Executive financial dashboards and system governance |
+| **Internal Staff** | `staff@brightloop.io` | `BrightStaff2026!` | Marcus Reed (Billing Operations) | Operations console, quotes, subscriptions, invoices, payment capture |
+| **Internal Staff** | `chloe.adams@brightloop.io` | `BrightStaff2026!` | Chloe Adams (Enterprise AE) | Quotation templates, contract renewals, customer provisioning |
+| **Customer (TechCorp)** | `sarah@techcorp.com` | `CustomerPass2026!` | Sarah Jenkins (TechCorp Global) | Self-service portal: subscriptions, pause/resume, invoice settlement |
+| **Customer (Odoo Edition)** | `john@urbanretail.com` | `CustomerPass2026!` | John Davis (Urban Retailers Ltd) | Portal access for Urban Retailers Odoo-integrated subscription |
+| **Customer (Logistics)** | `emily.watson@apexlogistics.com` | `CustomerPass2026!` | Emily Watson (Apex Freight) | High-volume multi-region freight tracking cluster |
+| **Customer (FinTech)** | `robert.kim@fintechpulse.io` | `CustomerPass2026!` | Robert Kim (FinTech Pulse) | Regulatory SaaS deployment with hardware 2FA keys |
+| **Customer (Consulting)** | `clara.moreau@lyonconsulting.eu` | `CustomerPass2026!` | Clara Moreau (Lyon Advisory) | European Union consulting deployment (paused lifecycle demo) |
+| **Customer (Clean Energy)** | `sam.okonkwo@saharaenergy.org` | `CustomerPass2026!` | Samuel Okonkwo (Sahara Clean Power) | Annual renewable grid monitoring contract |
+| **Customer (Healthcare)** | `priya.nair@vertexhealth.com` | `CustomerPass2026!` | Dr. Priya Nair (Vertex Health) | HIPAA analytics cluster (draft stage quote) |
 
 > [!NOTE]
 > All passwords strictly enforce the system security policy: minimum 9 characters, at least one uppercase letter, one lowercase letter, one digit, and one special character (`!@#$%^&*`).
