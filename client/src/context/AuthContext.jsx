@@ -63,17 +63,6 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('brightloop_user');
   };
 
-  // Quick switcher for paired role evaluation
-  const switchRoleDemo = async (roleType) => {
-    const credentials = {
-      admin: { email: 'admin@brightloop.io', pass: 'BrightAdmin2026!' },
-      staff: { email: 'staff@brightloop.io', pass: 'BrightStaff2026!' },
-      customer: { email: 'sarah@techcorp.com', pass: 'CustomerPass2026!' }
-    };
-    const target = credentials[roleType] || credentials.admin;
-    return login(target.email, target.pass);
-  };
-
   const value = {
     user,
     token,
@@ -81,7 +70,6 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-    switchRoleDemo,
     isAdmin: user?.role === 'admin',
     isStaff: user?.role === 'staff',
     isInternal: user?.role === 'admin' || user?.role === 'staff',

@@ -3,12 +3,12 @@ import {
   Box, Card, CardContent, Typography, TextField, Button,
   Alert, InputAdornment, IconButton, Divider, CircularProgress, Stack
 } from '@mui/material';
-import { Eye, EyeOff, Lock, Mail, ArrowRight, ShieldCheck, UserCheck, Briefcase } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { tokens } from '../../theme';
 
 export default function LoginPage({ onNavigate }) {
-  const { login, switchRoleDemo } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -28,18 +28,6 @@ export default function LoginPage({ onNavigate }) {
       await login(email, password);
     } catch (err) {
       setError(err.message || 'Failed to log in. Please check your credentials.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleQuickDemo = async (role) => {
-    try {
-      setError('');
-      setSubmitting(true);
-      await switchRoleDemo(role);
-    } catch (err) {
-      setError(err.message || 'Demo login failed');
     } finally {
       setSubmitting(false);
     }
@@ -185,46 +173,6 @@ export default function LoginPage({ onNavigate }) {
               </Button>
             </Stack>
           </form>
-
-          {/* Quick Demo Role Switches */}
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="caption" sx={{ px: 1, color: tokens.muted, fontWeight: 500, letterSpacing: '0.02em' }}>
-              DEMO 1-CLICK ROLE ACCESS
-            </Typography>
-          </Divider>
-
-          <Stack spacing={1}>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleQuickDemo('admin')}
-              disabled={submitting}
-              startIcon={<ShieldCheck size={16} color={tokens.status.danger.text} />}
-              sx={{ justifyContent: 'flex-start', py: 0.8, fontSize: '13px' }}
-            >
-              Log in as <strong>&nbsp;Admin (Full Control)</strong>
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleQuickDemo('staff')}
-              disabled={submitting}
-              startIcon={<Briefcase size={16} color={tokens.status.info.text} />}
-              sx={{ justifyContent: 'flex-start', py: 0.8, fontSize: '13px' }}
-            >
-              Log in as <strong>&nbsp;Internal Staff (Operations)</strong>
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleQuickDemo('customer')}
-              disabled={submitting}
-              startIcon={<UserCheck size={16} color={tokens.status.success.text} />}
-              sx={{ justifyContent: 'flex-start', py: 0.8, fontSize: '13px' }}
-            >
-              Log in as <strong>&nbsp;Customer (Client Portal)</strong>
-            </Button>
-          </Stack>
 
           <Box sx={{ mt: 3, pt: 2, borderTop: `1px solid ${tokens.line}`, textAlign: 'center' }}>
             <Typography variant="body2" sx={{ color: tokens.muted, fontSize: '13px' }}>

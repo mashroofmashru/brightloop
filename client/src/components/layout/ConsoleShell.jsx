@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import {
   LayoutDashboard, RefreshCw, FileText, Receipt, CreditCard,
-  Package, Percent, Landmark, Users, UserCog, BarChart3, LogOut, ChevronDown, ShieldCheck, Briefcase
+  Package, Percent, Landmark, Users, UserCog, BarChart3, LogOut, ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import StatusBadge from '../StatusBadge';
@@ -14,7 +14,7 @@ import { tokens } from '../../theme';
 const DRAWER_WIDTH = 250;
 
 export default function ConsoleShell({ currentView, onNavigate, children }) {
-  const { user, logout, isAdmin, switchRoleDemo } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   // Console nav items. Staff management is ADMIN ONLY.
@@ -159,32 +159,13 @@ export default function ConsoleShell({ currentView, onNavigate, children }) {
             open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
             PaperProps={{
-              sx: { width: 220, borderRadius: '8px', border: `1px solid ${tokens.line}`, mt: 1 }
+              sx: { width: 200, borderRadius: '8px', border: `1px solid ${tokens.line}`, mt: 1 }
             }}
           >
-            <Box sx={{ px: 2, py: 1, borderBottom: `1px solid ${tokens.line}` }}>
-              <Typography variant="caption" sx={{ color: tokens.muted, fontWeight: 600, display: 'block' }}>
-                QUICK ROLE SWITCH:
-              </Typography>
-            </Box>
-            <MenuItem onClick={() => { setAnchorEl(null); switchRoleDemo('admin'); }}>
-              <ShieldCheck size={14} style={{ marginRight: 8, color: tokens.status.danger.text }} />
-              <Typography variant="body2" sx={{ fontSize: '13px' }}>Switch to Admin</Typography>
+            <MenuItem onClick={() => { setAnchorEl(null); logout(); }} sx={{ color: tokens.status.danger.text }}>
+              <LogOut size={14} style={{ marginRight: 8 }} />
+              <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 600 }}>Sign Out</Typography>
             </MenuItem>
-            <MenuItem onClick={() => { setAnchorEl(null); switchRoleDemo('staff'); }}>
-              <Briefcase size={14} style={{ marginRight: 8, color: tokens.status.info.text }} />
-              <Typography variant="body2" sx={{ fontSize: '13px' }}>Switch to Staff</Typography>
-            </MenuItem>
-            <MenuItem onClick={() => { setAnchorEl(null); switchRoleDemo('customer'); }}>
-              <Users size={14} style={{ marginRight: 8, color: tokens.status.success.text }} />
-              <Typography variant="body2" sx={{ fontSize: '13px' }}>Switch to Customer</Typography>
-            </MenuItem>
-            <Box sx={{ borderTop: `1px solid ${tokens.line}`, mt: 0.5 }}>
-              <MenuItem onClick={() => { setAnchorEl(null); logout(); }} sx={{ color: tokens.status.danger.text }}>
-                <LogOut size={14} style={{ marginRight: 8 }} />
-                <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 600 }}>Sign Out</Typography>
-              </MenuItem>
-            </Box>
           </Menu>
         </Box>
       </Drawer>
