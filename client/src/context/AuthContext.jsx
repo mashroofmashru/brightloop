@@ -63,6 +63,14 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('brightloop_user');
   };
 
+  const updateUser = (updatedUser) => {
+    setUser(prev => {
+      const merged = { ...prev, ...updatedUser };
+      localStorage.setItem('brightloop_user', JSON.stringify(merged));
+      return merged;
+    });
+  };
+
   const value = {
     user,
     token,
@@ -70,6 +78,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    updateUser,
     isAdmin: user?.role === 'admin',
     isStaff: user?.role === 'staff',
     isInternal: user?.role === 'admin' || user?.role === 'staff',

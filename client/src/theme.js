@@ -184,6 +184,13 @@ export const theme = createTheme({
           }
         }
       }
+    },
+    MuiListItemText: {
+      styleOverrides: {
+        primary: {
+          color: 'inherit'
+        }
+      }
     }
   }
 });

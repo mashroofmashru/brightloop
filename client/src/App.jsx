@@ -14,9 +14,12 @@ import QuotationTemplatesPage from './pages/QuotationTemplatesPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import InvoicesPage from './pages/InvoicesPage';
 import PaymentsPage from './pages/PaymentsPage';
-import TaxesDiscountsPage from './pages/TaxesDiscountsPage';
+import DiscountsPage from './pages/DiscountsPage';
+import TaxesPage from './pages/TaxesPage';
 import ReportsPage from './pages/ReportsPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
+import CustomerInvoicesPage from './pages/CustomerInvoicesPage';
+import CustomerProfilePage from './pages/CustomerProfilePage';
 import { tokens } from './theme';
 
 export default function App() {
@@ -24,6 +27,7 @@ export default function App() {
   const [authView, setAuthView] = useState('login');
   const [resetToken, setResetToken] = useState('');
   const [consoleView, setConsoleView] = useState('dashboard');
+  const [customerView, setCustomerView] = useState('portal-subscriptions');
   const [templateToUse, setTemplateToUse] = useState(null);
 
   if (loading) {
@@ -64,9 +68,21 @@ export default function App() {
 
   // Customer Portal Shell
   if (isCustomer) {
+    const renderCustomerContent = () => {
+      switch (customerView) {
+        case 'portal-invoices':
+          return <CustomerInvoicesPage onNavigate={setCustomerView} />;
+        case 'portal-profile':
+          return <CustomerProfilePage onNavigate={setCustomerView} />;
+        case 'portal-subscriptions':
+        default:
+          return <CustomerPortalPage onNavigate={setCustomerView} />;
+      }
+    };
+
     return (
-      <PortalShell currentView="portal-subscriptions" onNavigate={() => {}}>
-        <CustomerPortalPage onNavigate={() => {}} />
+      <PortalShell currentView={customerView} onNavigate={setCustomerView}>
+        {renderCustomerContent()}
       </PortalShell>
     );
   }
@@ -99,8 +115,11 @@ export default function App() {
       case 'payments':
         return <PaymentsPage />;
       case 'discounts':
+        return <DiscountsPage />;
       case 'taxes':
-        return <TaxesDiscountsPage />;
+        return <TaxesPage />;
+      case 'customers':
+        return <SubscriptionsPage />;
       case 'reports':
         return <ReportsPage />;
       case 'dashboard':

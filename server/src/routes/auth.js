@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { db } from '../db.js';
-import { validatePassword, authenticateToken, JWT_SECRET } from '../middleware/auth.js';
+import { validatePassword, authenticateToken, getHashedAccountNumber, JWT_SECRET } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -56,6 +56,7 @@ router.post('/register', async (req, res) => {
     const result = insert.run(name.trim(), cleanEmail, password_hash, company_name || null, phone || null);
 
     const newUser = db.prepare('SELECT id, name, email, role, company_name, phone, created_at FROM users WHERE id = ?').get(result.lastInsertRowid);
+    newUser.account_id = getHashedAccountNumber(newUser.id, newUser.email);
     const token = generateToken(newUser);
 
     res.status(201).json({
@@ -92,6 +93,7 @@ router.post('/login', async (req, res) => {
 
     const safeUser = {
       id: user.id,
+      account_id: getHashedAccountNumber(user.id, user.email),
       name: user.name,
       email: user.email,
       role: user.role,

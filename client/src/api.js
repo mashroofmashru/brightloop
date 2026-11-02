@@ -54,7 +54,16 @@ export const usersApi = {
     method: 'POST',
     body: JSON.stringify(staffData)
   }),
-  getCustomers: () => apiRequest('/users/customers')
+  getCustomers: () => apiRequest('/users/customers'),
+  getProfile: () => apiRequest('/users/profile'),
+  updateProfile: (profileData) => apiRequest('/users/profile', {
+    method: 'PUT',
+    body: JSON.stringify(profileData)
+  }),
+  changePassword: (passwordData) => apiRequest('/users/change-password', {
+    method: 'POST',
+    body: JSON.stringify(passwordData)
+  })
 };
 
 export const productsApi = {

@@ -31,6 +31,20 @@ export function validatePassword(password) {
 }
 
 /**
+ * Compute deterministic 8-digit hashed account number for a user
+ */
+export function getHashedAccountNumber(userId, email = '') {
+  let hash = 2166136261;
+  const str = `brightloop_account_${userId}_${email || ''}`;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+  }
+  const num = (Math.abs(hash) % 90000000) + 10000000;
+  return `#${num}`;
+}
+
+/**
  * Middleware: Verify JWT and attach user
  */
 export function authenticateToken(req, res, next) {
@@ -46,11 +60,12 @@ export function authenticateToken(req, res, next) {
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
 
-    const user = db.prepare('SELECT id, name, email, role, company_name, phone FROM users WHERE id = ?').get(decoded.id);
+    const user = db.prepare('SELECT id, name, email, role, company_name, phone, created_at FROM users WHERE id = ?').get(decoded.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    user.account_id = getHashedAccountNumber(user.id, user.email);
     req.user = user;
     next();
   });

@@ -5,17 +5,26 @@ import {
   CircularProgress, Divider, Tabs, Tab, Dialog, DialogTitle, DialogContent,
   DialogActions, IconButton
 } from '@mui/material';
-import {
-  RefreshCw, Receipt, Building, Mail, Phone, Pause, Play, CheckCircle,
-  Printer, CreditCard, X
-} from 'lucide-react';
+import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
+import BusinessRoundedIcon from '@mui/icons-material/BusinessRounded';
+import EmailRoundedIcon from '@mui/icons-material/EmailRounded';
+import PhoneRoundedIcon from '@mui/icons-material/PhoneRounded';
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import PrintRoundedIcon from '@mui/icons-material/PrintRounded';
+import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import { subscriptionsApi, invoicesApi, paymentsApi } from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 import LifecycleStepper from '../components/LifecycleStepper';
 import { tokens } from '../theme';
 
-export default function CustomerPortalPage() {
+export default function CustomerPortalPage({ onNavigate }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(0); // 0 = Subscriptions, 1 = Invoices
   const [subscriptions, setSubscriptions] = useState([]);
@@ -127,13 +136,26 @@ export default function CustomerPortalPage() {
         <Grid item xs={12} md={4}>
           <Card sx={{ border: `1px solid ${tokens.line}`, borderRadius: '12px' }}>
             <CardContent sx={{ p: 3 }}>
-              <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 700, mb: 2 }}>
-                Account Information
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h3" sx={{ fontSize: '16px', fontWeight: 700 }}>
+                  Account Information
+                </Typography>
+                {onNavigate && (
+                  <Button
+                    size="small"
+                    variant="text"
+                    startIcon={<EditRoundedIcon sx={{ fontSize: 15 }} />}
+                    onClick={() => onNavigate('portal-profile')}
+                    sx={{ color: tokens.accent, fontSize: '12px', fontWeight: 600, textTransform: 'none', p: 0.5 }}
+                  >
+                    Edit Profile
+                  </Button>
+                )}
+              </Box>
 
               <Stack spacing={2}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Mail size={16} color={tokens.muted} />
+                  <EmailRoundedIcon sx={{ fontSize: 18, color: tokens.muted }} />
                   <Box>
                     <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>Email</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>{user?.email}</Typography>
@@ -141,7 +163,7 @@ export default function CustomerPortalPage() {
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Building size={16} color={tokens.muted} />
+                  <BusinessRoundedIcon sx={{ fontSize: 18, color: tokens.muted }} />
                   <Box>
                     <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>Company</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>{user?.company_name || '—'}</Typography>
@@ -149,7 +171,7 @@ export default function CustomerPortalPage() {
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Phone size={16} color={tokens.muted} />
+                  <PhoneRoundedIcon sx={{ fontSize: 18, color: tokens.muted }} />
                   <Box>
                     <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>Phone Contact</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>{user?.phone || '—'}</Typography>
@@ -247,7 +269,7 @@ export default function CustomerPortalPage() {
                               <Button
                                 size="small"
                                 variant="outlined"
-                                startIcon={sub.status === 'paused' ? <Play size={14} /> : <Pause size={14} />}
+                                startIcon={sub.status === 'paused' ? <PlayArrowRoundedIcon sx={{ fontSize: 16 }} /> : <PauseRoundedIcon sx={{ fontSize: 16 }} />}
                                 onClick={() => handleTogglePause(sub)}
                                 sx={{
                                   borderColor: sub.status === 'paused' ? tokens.status.success.text : tokens.status.warning.text,
@@ -269,6 +291,20 @@ export default function CustomerPortalPage() {
               {/* TAB 1: INVOICES & STATEMENTS */}
               {activeTab === 1 && (
                 <Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                    {onNavigate && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<ReceiptLongRoundedIcon sx={{ fontSize: 16 }} />}
+                        endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />}
+                        onClick={() => onNavigate('portal-invoices')}
+                        sx={{ fontSize: '12px', fontWeight: 600, textTransform: 'none', borderColor: tokens.line, color: tokens.ink }}
+                      >
+                        Open Full Invoices Ledger
+                      </Button>
+                    )}
+                  </Box>
                   {loading ? (
                     <Box sx={{ textAlign: 'center', py: 5 }}>
                       <CircularProgress size={24} sx={{ color: tokens.accent }} />
@@ -344,7 +380,7 @@ export default function CustomerPortalPage() {
                   <Button
                     variant="contained"
                     size="small"
-                    startIcon={<CreditCard size={15} />}
+                    startIcon={<CreditCardRoundedIcon sx={{ fontSize: 16 }} />}
                     onClick={() => handlePayInvoice(activeInvoice)}
                     disabled={payingInvoice}
                     sx={{ backgroundColor: tokens.status.success.text, mr: 1.5 }}
@@ -358,14 +394,14 @@ export default function CustomerPortalPage() {
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={<Printer size={15} />}
+                  startIcon={<PrintRoundedIcon sx={{ fontSize: 16 }} />}
                   onClick={handlePrint}
                   sx={{ borderColor: tokens.line, color: tokens.ink }}
                 >
                   Print / Save PDF
                 </Button>
                 <IconButton onClick={() => setInvoiceModalOpen(false)} size="small">
-                  <X size={18} />
+                  <CloseRoundedIcon sx={{ fontSize: 20 }} />
                 </IconButton>
               </Stack>
             </Box>

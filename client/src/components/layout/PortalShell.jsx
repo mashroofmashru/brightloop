@@ -1,8 +1,12 @@
 import React from 'react';
 import {
-  Box, AppBar, Toolbar, Typography, Button, Avatar, IconButton, Menu, MenuItem, Container
+  Box, AppBar, Toolbar, Typography, Button, Avatar, IconButton, Menu, MenuItem, Container, Divider
 } from '@mui/material';
-import { RefreshCw, Receipt, User, LogOut, ChevronDown } from 'lucide-react';
+import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import { useAuth } from '../../context/AuthContext';
 import StatusBadge from '../StatusBadge';
 import { tokens } from '../../theme';
@@ -12,9 +16,9 @@ export default function PortalShell({ currentView, onNavigate, children }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const navItems = [
-    { id: 'portal-subscriptions', label: 'My Subscriptions', icon: RefreshCw },
-    { id: 'portal-invoices', label: 'My Invoices', icon: Receipt },
-    { id: 'portal-profile', label: 'Account Profile', icon: User }
+    { id: 'portal-subscriptions', label: 'My Subscriptions', icon: AutorenewRoundedIcon },
+    { id: 'portal-invoices', label: 'My Invoices', icon: ReceiptLongRoundedIcon },
+    { id: 'portal-profile', label: 'Account Profile', icon: AccountCircleRoundedIcon }
   ];
 
   return (
@@ -33,7 +37,7 @@ export default function PortalShell({ currentView, onNavigate, children }) {
           <Toolbar disableGutters sx={{ minHeight: '64px', display: 'flex', justifyContent: 'space-between' }}>
             {/* Brand */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, cursor: 'pointer' }} onClick={() => onNavigate('portal-subscriptions')}>
                 <Box
                   sx={{
                     width: 32,
@@ -69,13 +73,13 @@ export default function PortalShell({ currentView, onNavigate, children }) {
                     <Button
                       key={item.id}
                       onClick={() => onNavigate(item.id)}
-                      startIcon={<Icon size={16} />}
+                      startIcon={<Icon sx={{ fontSize: 18 }} />}
                       sx={{
                         color: isSelected ? tokens.accent : tokens.muted,
                         fontWeight: isSelected ? 600 : 500,
                         backgroundColor: isSelected ? tokens.accent50 : 'transparent',
                         borderRadius: '8px',
-                        px: 1.5,
+                        px: 1.75,
                         py: 0.75,
                         '&:hover': {
                           backgroundColor: isSelected ? tokens.accent50 : tokens.canvas,
@@ -123,7 +127,7 @@ export default function PortalShell({ currentView, onNavigate, children }) {
                     {user?.company_name || 'Customer Account'}
                   </Typography>
                 </Box>
-                <ChevronDown size={14} color={tokens.muted} />
+                <KeyboardArrowDownRoundedIcon sx={{ fontSize: 18, color: tokens.muted }} />
               </Box>
 
               <Menu
@@ -131,11 +135,32 @@ export default function PortalShell({ currentView, onNavigate, children }) {
                 open={Boolean(anchorEl)}
                 onClose={() => setAnchorEl(null)}
                 PaperProps={{
-                  sx: { width: 180, borderRadius: '8px', border: `1px solid ${tokens.line}`, mt: 1 }
+                  sx: { width: 200, borderRadius: '8px', border: `1px solid ${tokens.line}`, mt: 1 }
                 }}
               >
-                <MenuItem onClick={() => { setAnchorEl(null); logout(); }} sx={{ color: tokens.status.danger.text }}>
-                  <LogOut size={14} style={{ marginRight: 8 }} />
+                <MenuItem
+                  onClick={() => {
+                    setAnchorEl(null);
+                    onNavigate('portal-profile');
+                  }}
+                  sx={{ color: tokens.ink, py: 1 }}
+                >
+                  <AccountCircleRoundedIcon sx={{ fontSize: 18, mr: 1.25, color: tokens.muted }} />
+                  <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 500 }}>Account Profile</Typography>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setAnchorEl(null);
+                    onNavigate('portal-invoices');
+                  }}
+                  sx={{ color: tokens.ink, py: 1 }}
+                >
+                  <ReceiptLongRoundedIcon sx={{ fontSize: 18, mr: 1.25, color: tokens.muted }} />
+                  <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 500 }}>My Invoices</Typography>
+                </MenuItem>
+                <Divider sx={{ my: 0.5 }} />
+                <MenuItem onClick={() => { setAnchorEl(null); logout(); }} sx={{ color: tokens.status.danger.text, py: 1 }}>
+                  <LogoutRoundedIcon sx={{ fontSize: 18, mr: 1.25 }} />
                   <Typography variant="body2" sx={{ fontSize: '13px', fontWeight: 600 }}>Sign Out</Typography>
                 </MenuItem>
               </Menu>

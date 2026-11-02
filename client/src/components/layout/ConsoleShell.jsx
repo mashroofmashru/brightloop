@@ -95,9 +95,23 @@ export default function ConsoleShell({ currentView, onNavigate, children }) {
                       px: 1.5,
                       backgroundColor: isSelected ? tokens.ink : 'transparent',
                       color: isSelected ? '#FFFFFF' : tokens.muted,
+                      '& .MuiListItemText-primary': {
+                        color: isSelected ? '#FFFFFF !important' : tokens.muted,
+                        fontSize: '13.5px',
+                        fontWeight: isSelected ? 600 : 500
+                      },
+                      '& .MuiListItemIcon-root': {
+                        color: isSelected ? '#FFFFFF !important' : tokens.muted
+                      },
                       '&:hover': {
                         backgroundColor: isSelected ? tokens.ink : tokens.canvas,
-                        color: isSelected ? '#FFFFFF' : tokens.ink
+                        color: isSelected ? '#FFFFFF' : tokens.ink,
+                        '& .MuiListItemText-primary': {
+                          color: isSelected ? '#FFFFFF !important' : tokens.ink
+                        },
+                        '& .MuiListItemIcon-root': {
+                          color: isSelected ? '#FFFFFF !important' : tokens.ink
+                        }
                       }
                     }}
                   >
@@ -108,7 +122,8 @@ export default function ConsoleShell({ currentView, onNavigate, children }) {
                       primary={item.label}
                       primaryTypographyProps={{
                         fontSize: '13.5px',
-                        fontWeight: isSelected ? 600 : 500
+                        fontWeight: isSelected ? 600 : 500,
+                        color: isSelected ? '#FFFFFF' : tokens.muted
                       }}
                     />
                   </ListItemButton>
