@@ -16,6 +16,7 @@ import InvoicesPage from './pages/InvoicesPage';
 import PaymentsPage from './pages/PaymentsPage';
 import DiscountsPage from './pages/DiscountsPage';
 import TaxesPage from './pages/TaxesPage';
+import CustomersPage from './pages/CustomersPage';
 import ReportsPage from './pages/ReportsPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
 import CustomerInvoicesPage from './pages/CustomerInvoicesPage';
@@ -119,7 +120,7 @@ export default function App() {
       case 'taxes':
         return <TaxesPage />;
       case 'customers':
-        return <SubscriptionsPage />;
+        return <CustomersPage onNavigate={setConsoleView} />;
       case 'reports':
         return <ReportsPage />;
       case 'dashboard':

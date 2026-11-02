@@ -55,6 +55,15 @@ export const usersApi = {
     body: JSON.stringify(staffData)
   }),
   getCustomers: () => apiRequest('/users/customers'),
+  getCustomerDetails: (id) => apiRequest(`/users/customers/${id}`),
+  addCustomer: (customerData) => apiRequest('/users/customers', {
+    method: 'POST',
+    body: JSON.stringify(customerData)
+  }),
+  updateCustomer: (id, customerData) => apiRequest(`/users/customers/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(customerData)
+  }),
   getProfile: () => apiRequest('/users/profile'),
   updateProfile: (profileData) => apiRequest('/users/profile', {
     method: 'PUT',
