@@ -27,10 +27,14 @@ export default function PortalShell({ currentView, onNavigate, children }) {
       <AppBar
         position="sticky"
         elevation={0}
+        className="no-print"
         sx={{
           backgroundColor: tokens.surface,
           borderBottom: `1px solid ${tokens.line}`,
-          color: tokens.ink
+          color: tokens.ink,
+          '@media print': {
+            display: 'none !important'
+          }
         }}
       >
         <Container maxWidth="xl">

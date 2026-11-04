@@ -125,8 +125,48 @@ export default function ReportsPage() {
   }
 
   return (
-    <Box sx={{ p: 4 }}>
-      {/* Top Header & Report Controls */}
+    <Box sx={{ p: { xs: 2, md: 4 }, '@media print': { p: '0 !important', m: '0 !important' } }}>
+      {/* Print-Only Professional Executive Header */}
+      <Box className="print-only" sx={{ mb: 3, pb: 2, borderBottom: `2px solid ${tokens.ink}` }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 36,
+                height: 36,
+                borderRadius: '8px',
+                backgroundColor: tokens.ink,
+                color: '#FFFFFF',
+                fontWeight: 700,
+                fontSize: 18,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              B
+            </Box>
+            <Box>
+              <Typography variant="h3" sx={{ fontSize: '18px', fontWeight: 800, color: tokens.ink }}>
+                Brightloop Financial Intelligence Report
+              </Typography>
+              <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>
+                Subscription Economics & Executive Operating Performance
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="caption" sx={{ color: tokens.muted, display: 'block', fontWeight: 600 }}>
+              Scope: {timeRange === '1m' ? 'Current Billing Month' : timeRange === '6m' ? 'Trailing 6 Months' : 'Year to Date (2026)'}
+            </Typography>
+            <Typography variant="caption" sx={{ color: tokens.muted, display: 'block' }}>
+              Generated: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Screen Header & Report Controls (Buttons hidden on print) */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3.5, flexWrap: 'wrap', gap: 2 }}>
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
@@ -140,7 +180,13 @@ export default function ReportsPage() {
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1.5}
+          alignItems="center"
+          className="no-print"
+          sx={{ '@media print': { display: 'none !important' } }}
+        >
           <FormControl size="small" sx={{ minWidth: 150, backgroundColor: tokens.surface }}>
             <Select
               value={timeRange}
@@ -165,7 +211,7 @@ export default function ReportsPage() {
       </Box>
 
       {/* Row 1: Executive KPI Highlight Grid */}
-      <Grid container spacing={2} sx={{ mb: 3.5 }}>
+      <Grid container spacing={2} sx={{ mb: 3.5 }} className="print-avoid-break">
         <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ p: 2.5, border: `1px solid ${tokens.line}`, borderRadius: '12px', backgroundColor: tokens.surface }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -236,7 +282,7 @@ export default function ReportsPage() {
       </Grid>
 
       {/* Row 2: Interactive SVG Cash Flow & Revenue Trend Chart */}
-      <Card sx={{ p: 3, border: `1px solid ${tokens.line}`, borderRadius: '12px', mb: 3.5, backgroundColor: tokens.surface }}>
+      <Card sx={{ p: 3, border: `1px solid ${tokens.line}`, borderRadius: '12px', mb: 3.5, backgroundColor: tokens.surface }} className="print-avoid-break">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -375,7 +421,7 @@ export default function ReportsPage() {
       </Card>
 
       {/* Row 3: Donut Revenue by Plan & Aging Accounts Receivable */}
-      <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+      <Grid container spacing={2.5} sx={{ mb: 3.5 }} className="print-avoid-break">
         {/* Visual Donut Chart: Revenue Contribution by Plan */}
         <Grid item xs={12} md={5}>
           <Card sx={{ p: 3, border: `1px solid ${tokens.line}`, borderRadius: '12px', height: '100%', backgroundColor: tokens.surface }}>

@@ -41,10 +41,70 @@ button, a {
 }
 
 @media print {
-  body {
-    background: #FFFFFF !important;
-  }
-  .no-print {
+  /* Hide navigation bars, sidebars, drawers, interactive actions */
+  .no-print,
+  .MuiDrawer-root,
+  .MuiDrawer-docked,
+  .MuiAppBar-root,
+  nav,
+  aside {
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
   }
+
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Reset body and containers to 100% full-width */
+  html, body {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    font-size: 11pt !important;
+  }
+
+  #root,
+  main,
+  .MuiBox-root {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  main {
+    display: block !important;
+    min-height: auto !important;
+  }
+
+  /* High fidelity color reproduction for badges, cards, charts */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Print margins */
+  @page {
+    margin: 12mm 15mm;
+    size: auto;
+  }
+
+  /* Prevent cards, charts, and table rows from breaking awkwardly across pages */
+  .MuiCard-root,
+  .print-avoid-break,
+  table,
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+
+.print-only {
+  display: none;
 }

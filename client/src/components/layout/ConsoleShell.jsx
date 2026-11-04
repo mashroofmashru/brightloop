@@ -34,20 +34,38 @@ export default function ConsoleShell({ currentView, onNavigate, children }) {
   ];
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: tokens.canvas }}>
+    <Box
+      sx={{
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: tokens.canvas,
+        '@media print': {
+          display: 'block !important',
+          backgroundColor: '#FFFFFF !important',
+          minHeight: 'auto !important'
+        }
+      }}
+    >
       {/* Sidebar Drawer */}
       <Drawer
         variant="permanent"
+        className="no-print"
         sx={{
           width: DRAWER_WIDTH,
           flexShrink: 0,
+          '@media print': {
+            display: 'none !important'
+          },
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
             backgroundColor: tokens.surface,
             borderRight: `1px solid ${tokens.line}`,
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            '@media print': {
+              display: 'none !important'
+            }
           }
         }}
       >
@@ -186,7 +204,22 @@ export default function ConsoleShell({ currentView, onNavigate, children }) {
       </Drawer>
 
       {/* Main Content Area */}
-      <Box component="main" sx={{ flexGrow: 1, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          '@media print': {
+            display: 'block !important',
+            width: '100% !important',
+            minHeight: 'auto !important',
+            margin: '0 !important',
+            padding: '0 !important'
+          }
+        }}
+      >
         {children}
       </Box>
     </Box>
