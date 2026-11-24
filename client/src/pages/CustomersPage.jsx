@@ -765,7 +765,7 @@ export default function CustomersPage({ onNavigate }) {
                                 <StatusBadge status={sub.status} />
                               </TableCell>
                               <TableCell sx={{ fontWeight: 600 }}>
-                                ${sub.recurring_price || '0.00'}{' '}
+                                ${Number(sub.grand_total || 0).toFixed(2)}{' '}
                                 <Typography component="span" variant="caption" sx={{ color: tokens.muted }}>
                                   / {sub.billing_interval || 'month'}
                                 </Typography>
@@ -810,7 +810,7 @@ export default function CustomersPage({ onNavigate }) {
                                 {inv.invoice_number}
                               </TableCell>
                               <TableCell sx={{ color: tokens.muted, fontSize: '12px' }}>
-                                {inv.issue_date || '—'}
+                                {inv.invoice_date || '—'}
                               </TableCell>
                               <TableCell sx={{ color: tokens.muted, fontSize: '12px' }}>
                                 {inv.due_date || '—'}

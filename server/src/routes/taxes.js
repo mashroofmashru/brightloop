@@ -48,11 +48,28 @@ router.put('/:id', authenticateToken, requireRole('admin'), (req, res) => {
     const { name, rate, tax_type, is_active } = req.body;
     const taxId = req.params.id;
 
+    const existing = db.prepare('SELECT * FROM taxes WHERE id = ?').get(taxId);
+    if (!existing) {
+      return res.status(404).json({ error: 'Tax rule not found' });
+    }
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Tax name is required' });
+    }
+    if (tax_type !== undefined && !['exclusive', 'inclusive'].includes(tax_type)) {
+      return res.status(400).json({ error: 'Tax type must be exclusive or inclusive' });
+    }
+
     db.prepare(`
       UPDATE taxes
       SET name = ?, rate = ?, tax_type = ?, is_active = ?
       WHERE id = ?
-    `).run(name.trim(), parseFloat(rate) || 0, tax_type || 'exclusive', is_active !== false ? 1 : 0, taxId);
+    `).run(
+      name.trim(),
+      parseFloat(rate) || 0,
+      tax_type || 'exclusive',
+      is_active === undefined ? existing.is_active : (is_active !== false ? 1 : 0), // edit form omits is_active
+      taxId
+    );
 
     const updated = db.prepare('SELECT * FROM taxes WHERE id = ?').get(taxId);
     res.json({ message: 'Tax rule updated successfully', tax: updated });

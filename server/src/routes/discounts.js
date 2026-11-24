@@ -102,6 +102,23 @@ router.put('/:id', authenticateToken, requireRole('admin'), (req, res) => {
       is_active
     } = req.body;
 
+    const existing = db.prepare('SELECT * FROM discounts WHERE id = ?').get(discountId);
+    if (!existing) {
+      return res.status(404).json({ error: 'Discount not found' });
+    }
+    if (!name || !name.trim() || !code || !code.trim()) {
+      return res.status(400).json({ error: 'Name and code are required' });
+    }
+    if (!['fixed', 'percent'].includes(discount_type)) {
+      return res.status(400).json({ error: 'Discount type must be fixed or percent' });
+    }
+
+    const cleanCode = code.trim().toUpperCase();
+    const duplicate = db.prepare('SELECT id FROM discounts WHERE code = ? AND id != ?').get(cleanCode, discountId);
+    if (duplicate) {
+      return res.status(409).json({ field: 'code', error: 'A discount with this code already exists' });
+    }
+
     db.prepare(`
       UPDATE discounts
       SET name = ?, code = ?, discount_type = ?, value = ?, min_order_amount = ?,
@@ -120,7 +137,7 @@ router.put('/:id', authenticateToken, requireRole('admin'), (req, res) => {
       usage_limit ? parseInt(usage_limit, 10) : null,
       scope || 'order',
       target_product_id || null,
-      is_active !== false ? 1 : 0,
+      is_active === undefined ? existing.is_active : (is_active !== false ? 1 : 0), // edit form omits is_active
       discountId
     );
 

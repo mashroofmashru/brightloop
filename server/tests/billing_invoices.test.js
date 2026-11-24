@@ -1,3 +1,4 @@
+import './setup-test-db.js';
 import assert from 'assert';
 import { db } from '../src/db.js';
 

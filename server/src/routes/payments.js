@@ -83,11 +83,10 @@ router.post('/', authenticateToken, (req, res) => {
       reference_note
     } = req.body;
 
-    if (!invoice_id || !amount || parseFloat(amount) <= 0) {
+    const payAmount = parseFloat(amount);
+    if (!invoice_id || !Number.isFinite(payAmount) || payAmount <= 0) {
       return res.status(400).json({ error: 'Invoice ID and a valid payment amount are required' });
     }
-
-    const payAmount = parseFloat(amount);
 
     const invoice = db.prepare(`
       SELECT * FROM invoices WHERE id = ?
@@ -104,6 +103,23 @@ router.post('/', authenticateToken, (req, res) => {
 
     if (invoice.status === 'paid' || invoice.amount_due <= 0) {
       return res.status(400).json({ error: 'This invoice is already settled in full.' });
+    }
+
+    if (invoice.status !== 'confirmed') {
+      return res.status(400).json({
+        error: `Payments can only be recorded against confirmed invoices (this invoice is ${invoice.status}).`
+      });
+    }
+
+    const validMethods = ['credit_card', 'bank_transfer', 'stripe', 'check', 'cash'];
+    if (!validMethods.includes(method)) {
+      return res.status(400).json({ error: `Invalid payment method. Must be one of: [${validMethods.join(', ')}]` });
+    }
+
+    if (payAmount > invoice.amount_due + 0.005) {
+      return res.status(400).json({
+        error: `Payment of $${payAmount.toFixed(2)} exceeds the amount due of $${invoice.amount_due.toFixed(2)}.`
+      });
     }
 
     const paymentNumber = generatePaymentNumber();

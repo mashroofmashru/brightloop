@@ -57,7 +57,9 @@ app.use((err, req, res, next) => {
 async function startServer() {
   try {
     initDb();
-    await seedDatabase();
+    // Seed only when the database is empty so restarts never wipe user data.
+    // Use `npm run seed` for an explicit full reset.
+    await seedDatabase(false);
 
     app.listen(PORT, () => {
       console.log(`🚀 Brightloop API server listening on http://localhost:${PORT}`);

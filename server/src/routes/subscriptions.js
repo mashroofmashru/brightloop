@@ -298,7 +298,13 @@ router.patch('/:id/status', authenticateToken, (req, res) => {
       if (sub.customer_id !== req.user.id) {
         return res.status(403).json({ error: 'Access denied' });
       }
-      // Customer can pause (if allowed) or request cancel
+      // Customers may only pause, resume or close their own subscription; quoting and activation are staff actions.
+      if (!['paused', 'active', 'closed'].includes(targetStatus)) {
+        return res.status(403).json({ error: 'Customers can only pause, resume or close a subscription.' });
+      }
+      if (targetStatus === 'active' && sub.status !== 'paused') {
+        return res.status(403).json({ error: 'Customers can only resume a paused subscription.' });
+      }
       if (targetStatus === 'paused' && !sub.allow_pause) {
         return res.status(400).json({ error: 'This plan does not permit pausing.' });
       }

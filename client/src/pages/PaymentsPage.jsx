@@ -45,7 +45,8 @@ export default function PaymentsPage() {
       ]);
       setPayments(payRes.payments || []);
       // Filter invoices with outstanding balance for recording new payments
-      setInvoices((invRes.invoices || []).filter(i => i.amount_due > 0 && i.status !== 'cancelled'));
+      // Payments are only accepted against confirmed invoices with a balance (matches the server rule).
+      setInvoices((invRes.invoices || []).filter(i => i.status === 'confirmed' && i.amount_due > 0));
     } catch (err) {
       setErrorMsg(err.message || 'Failed to load payments');
     } finally {

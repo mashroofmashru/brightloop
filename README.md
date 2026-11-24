@@ -97,6 +97,10 @@ Seed standard products, Odoo variants, plans, tax rules, conditional discounts, 
 npm run seed
 ```
 
+> **Note:** `npm run seed` is a full reset: it wipes every table and reloads the demo dataset.
+> Starting the server does **not** reset data. It only seeds when the database is empty.
+> `npm test` runs against a temporary database, so it never changes `brightloop.db`.
+
 ### 4. Run the Development Platform
 Run both the backend API and frontend client in separate terminals:
 

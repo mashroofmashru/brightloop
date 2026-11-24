@@ -139,12 +139,16 @@ router.post('/forgot-password', (req, res) => {
     db.prepare('UPDATE users SET reset_token = ?, reset_token_expires_at = ? WHERE id = ?')
       .run(resetToken, expiresAt, user.id);
 
-    // In local development/demo, we return the resetToken so the user can easily test the reset flow!
-    res.json({
-      message: 'If an account exists with this email, a reset link has been dispatched.',
-      debugToken: resetToken,
-      resetUrl: `/reset-password?token=${resetToken}`
-    });
+    // Demo/development only: expose the token so the reset flow can be tested without email.
+    // Never return it when NODE_ENV=production.
+    const response = {
+      message: 'If an account exists with this email, a reset link has been dispatched.'
+    };
+    if (process.env.NODE_ENV !== 'production') {
+      response.debugToken = resetToken;
+      response.resetUrl = `/reset-password?token=${resetToken}`;
+    }
+    res.json(response);
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ error: 'Internal server error' });

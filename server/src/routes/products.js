@@ -136,6 +136,62 @@ router.put('/:id', authenticateToken, requireRole('admin'), (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Product name is required' });
+    }
+
+    const validTypes = ['software', 'service', 'physical'];
+    const prodType = validTypes.includes(type) ? type : 'software';
+
+    // Work out the variant changes before writing anything.
+    // Variants are matched by attribute name + value so unchanged rows keep their ids.
+    // Subscription, invoice and template lines reference variant ids, so rows in use cannot be deleted.
+    let variantPlan = null;
+    if (Array.isArray(variants)) {
+      const current = db.prepare('SELECT id, attribute_name, attribute_value FROM product_variants WHERE product_id = ?').all(productId);
+      const incoming = variants
+        .filter(v => v && v.attribute_name && v.attribute_value)
+        .map(v => ({
+          attribute_name: String(v.attribute_name).trim(),
+          attribute_value: String(v.attribute_value).trim(),
+          price_extra: parseFloat(v.price_extra) || 0,
+          sku: v.sku ? String(v.sku).trim() : null
+        }));
+
+      const matchedIds = new Set();
+      const toUpdate = [];
+      const toInsert = [];
+      for (const inc of incoming) {
+        const match = current.find(c =>
+          !matchedIds.has(c.id) &&
+          c.attribute_name === inc.attribute_name &&
+          c.attribute_value === inc.attribute_value
+        );
+        if (match) {
+          matchedIds.add(match.id);
+          toUpdate.push({ id: match.id, ...inc });
+        } else {
+          toInsert.push(inc);
+        }
+      }
+      const toDelete = current.filter(c => !matchedIds.has(c.id)).map(c => c.id);
+
+      const inUse = db.prepare(`
+        SELECT
+          (SELECT COUNT(*) FROM subscription_lines WHERE variant_id = ?) +
+          (SELECT COUNT(*) FROM invoice_lines WHERE variant_id = ?) +
+          (SELECT COUNT(*) FROM quotation_template_lines WHERE variant_id = ?) AS refs
+      `);
+      for (const id of toDelete) {
+        if (inUse.get(id, id, id).refs > 0) {
+          return res.status(409).json({
+            error: 'A variant that is used by existing subscriptions or invoices cannot be removed. Keep it or archive the product instead.'
+          });
+        }
+      }
+      variantPlan = { toUpdate, toInsert, toDelete };
+    }
+
     const updateProductTransaction = db.transaction(() => {
       db.prepare(`
         UPDATE products
@@ -143,32 +199,29 @@ router.put('/:id', authenticateToken, requireRole('admin'), (req, res) => {
         WHERE id = ?
       `).run(
         name.trim(),
-        type || 'software',
+        prodType,
         parseFloat(sales_price) || 0,
         parseFloat(cost_price) || 0,
         notes || null,
         productId
       );
 
-      // Re-sync variants
-      if (Array.isArray(variants)) {
-        db.prepare('DELETE FROM product_variants WHERE product_id = ?').run(productId);
-
+      if (variantPlan) {
+        const updateVariant = db.prepare('UPDATE product_variants SET price_extra = ?, sku = ? WHERE id = ?');
         const insertVariant = db.prepare(`
           INSERT INTO product_variants (product_id, attribute_name, attribute_value, price_extra, sku)
           VALUES (?, ?, ?, ?, ?)
         `);
+        const deleteVariant = db.prepare('DELETE FROM product_variants WHERE id = ?');
 
-        for (const variant of variants) {
-          if (variant.attribute_name && variant.attribute_value) {
-            insertVariant.run(
-              productId,
-              variant.attribute_name.trim(),
-              variant.attribute_value.trim(),
-              parseFloat(variant.price_extra) || 0,
-              variant.sku ? variant.sku.trim() : null
-            );
-          }
+        for (const v of variantPlan.toUpdate) {
+          updateVariant.run(v.price_extra, v.sku, v.id);
+        }
+        for (const v of variantPlan.toInsert) {
+          insertVariant.run(productId, v.attribute_name, v.attribute_value, v.price_extra, v.sku);
+        }
+        for (const id of variantPlan.toDelete) {
+          deleteVariant.run(id);
         }
       }
     });

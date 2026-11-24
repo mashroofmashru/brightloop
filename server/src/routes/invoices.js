@@ -24,25 +24,40 @@ function generateInvoiceNumber() {
   return `INV-${year}-${String(nextSeq).padStart(4, '0')}`;
 }
 
+// Date helpers work on YYYY-MM-DD strings in UTC so the result never depends on the server's timezone.
+function parseDateParts(dateStr) {
+  const [y, m, d] = String(dateStr).slice(0, 10).split('-').map(Number);
+  return { y, m, d };
+}
+
+function addDays(dateStr, days) {
+  const { y, m, d } = parseDateParts(dateStr);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().split('T')[0];
+}
+
+// Adds months and clamps to the last day of the target month (Jan 31 + 1 month = Feb 28/29, not Mar 3).
+// anchorDay keeps the billing day stable: a Jan 31 cycle goes Feb 28 -> Mar 31, not Mar 28 for good.
+function addMonths(dateStr, months, anchorDay) {
+  const { y, m, d } = parseDateParts(dateStr);
+  const targetMonth = m - 1 + months;
+  const lastDay = new Date(Date.UTC(y, targetMonth + 1, 0)).getUTCDate();
+  const day = anchorDay || d;
+  return new Date(Date.UTC(y, targetMonth, Math.min(day, lastDay))).toISOString().split('T')[0];
+}
+
 // Helper: Advance next billing date by interval
-function computeNextBillingDate(currentDateStr, interval) {
-  const date = new Date(currentDateStr);
+function computeNextBillingDate(currentDateStr, interval, anchorDay) {
   switch (interval) {
     case 'daily':
-      date.setDate(date.getDate() + 1);
-      break;
+      return addDays(currentDateStr, 1);
     case 'weekly':
-      date.setDate(date.getDate() + 7);
-      break;
+      return addDays(currentDateStr, 7);
     case 'yearly':
-      date.setFullYear(date.getFullYear() + 1);
-      break;
+      return addMonths(currentDateStr, 12, anchorDay);
     case 'monthly':
     default:
-      date.setMonth(date.getMonth() + 1);
-      break;
+      return addMonths(currentDateStr, 1, anchorDay);
   }
-  return date.toISOString().split('T')[0];
 }
 
 // GET /api/invoices (Filtered by role: Customers see only own invoices)
@@ -81,7 +96,7 @@ router.get('/', authenticateToken, (req, res) => {
     }
 
     if (overdueOnly === 'true') {
-      query += ' AND i.status = "confirmed" AND i.due_date < ? AND i.amount_due > 0';
+      query += " AND i.status = 'confirmed' AND i.due_date < ? AND i.amount_due > 0";
       params.push(today);
     }
 
@@ -168,7 +183,8 @@ router.post('/run-billing', authenticateToken, requireRole('admin', 'staff'), (r
     const runBillingTransaction = db.transaction(() => {
       for (const sub of dueSubscriptions) {
         const periodStart = sub.next_billing_date || billingDate;
-        const periodEnd = computeNextBillingDate(periodStart, sub.billing_interval);
+        const anchorDay = parseDateParts(sub.start_date || periodStart).d;
+        const periodEnd = computeNextBillingDate(periodStart, sub.billing_interval, anchorDay);
 
         // 1. IDEMPOTENCY CHECK: Ensure not billed twice for this period!
         const existingInvoice = db.prepare(`
@@ -250,11 +266,8 @@ router.post('/run-billing', authenticateToken, requireRole('admin', 'staff'), (r
         const invoiceNumber = generateInvoiceNumber();
 
         // Calculate due date from payment terms
-        const dueDateObj = new Date(periodStart);
-        if (sub.payment_terms === 'Net 15') dueDateObj.setDate(dueDateObj.getDate() + 15);
-        else if (sub.payment_terms === 'Net 30') dueDateObj.setDate(dueDateObj.getDate() + 30);
-        else if (sub.payment_terms === 'Net 60') dueDateObj.setDate(dueDateObj.getDate() + 60);
-        const dueDate = dueDateObj.toISOString().split('T')[0];
+        const termDays = { 'Net 15': 15, 'Net 30': 30, 'Net 60': 60 }[sub.payment_terms] || 0;
+        const dueDate = addDays(periodStart, termDays);
 
         // 4. Create Generated Invoice
         const insertInv = db.prepare(`
@@ -312,7 +325,7 @@ router.post('/run-billing', authenticateToken, requireRole('admin', 'staff'), (r
         }
 
         // 6. Advance Subscription next_billing_date (Idempotency checkpoint)
-        const nextPeriod = computeNextBillingDate(periodStart, sub.billing_interval);
+        const nextPeriod = computeNextBillingDate(periodStart, sub.billing_interval, anchorDay);
         db.prepare('UPDATE subscriptions SET next_billing_date = ? WHERE id = ?').run(nextPeriod, sub.id);
 
         results.push({
@@ -373,7 +386,14 @@ router.patch('/:id/status', authenticateToken, requireRole('admin', 'staff'), (r
       });
     }
 
-    db.prepare('UPDATE invoices SET status = ? WHERE id = ?').run(targetStatus, invoiceId);
+    if (targetStatus === 'paid') {
+      // Keep the balance fields consistent, otherwise analytics keeps counting the invoice as outstanding.
+      db.prepare(`
+        UPDATE invoices SET status = 'paid', amount_paid = total_amount, amount_due = 0 WHERE id = ?
+      `).run(invoiceId);
+    } else {
+      db.prepare('UPDATE invoices SET status = ? WHERE id = ?').run(targetStatus, invoiceId);
+    }
 
     const updated = db.prepare('SELECT * FROM invoices WHERE id = ?').get(invoiceId);
     res.json({ message: `Invoice moved to ${targetStatus}`, invoice: updated });

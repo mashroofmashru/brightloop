@@ -4,7 +4,10 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dbPath = path.resolve(__dirname, '../../brightloop.db');
+// BRIGHTLOOP_DB_PATH lets tests run against a throwaway database instead of the real one.
+const dbPath = process.env.BRIGHTLOOP_DB_PATH
+  ? path.resolve(process.env.BRIGHTLOOP_DB_PATH)
+  : path.resolve(__dirname, '../../brightloop.db');
 
 export const db = new Database(dbPath);
 

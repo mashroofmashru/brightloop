@@ -68,18 +68,17 @@ router.post('/staff', authenticateToken, requireRole('admin'), async (req, res) 
 // GET /api/users/customers (Admin and Staff can view customer list with aggregate subscription & billing metrics)
 router.get('/customers', authenticateToken, requireRole('admin', 'staff'), (req, res) => {
   try {
+    // Aggregates use correlated subqueries: joining subscriptions and invoices together
+    // would multiply each invoice by the number of subscriptions.
     const customers = db.prepare(`
-      SELECT 
+      SELECT
         u.id, u.name, u.email, u.role, u.company_name, u.phone, u.created_at,
-        COUNT(DISTINCT s.id) AS total_subscriptions_count,
-        COUNT(DISTINCT CASE WHEN s.status = 'active' THEN s.id END) AS active_subscriptions_count,
-        COALESCE(SUM(CASE WHEN i.status = 'paid' THEN i.total_amount ELSE 0 END), 0) AS total_paid,
-        COALESCE(SUM(CASE WHEN i.status IN ('confirmed', 'overdue') THEN i.total_amount ELSE 0 END), 0) AS outstanding_balance
+        (SELECT COUNT(*) FROM subscriptions s WHERE s.customer_id = u.id) AS total_subscriptions_count,
+        (SELECT COUNT(*) FROM subscriptions s WHERE s.customer_id = u.id AND s.status = 'active') AS active_subscriptions_count,
+        (SELECT COALESCE(SUM(i.total_amount), 0) FROM invoices i WHERE i.customer_id = u.id AND i.status = 'paid') AS total_paid,
+        (SELECT COALESCE(SUM(i.amount_due), 0) FROM invoices i WHERE i.customer_id = u.id AND i.status = 'confirmed') AS outstanding_balance
       FROM users u
-      LEFT JOIN subscriptions s ON s.customer_id = u.id
-      LEFT JOIN invoices i ON i.customer_id = u.id
       WHERE u.role = 'customer'
-      GROUP BY u.id
       ORDER BY u.name ASC
     `).all();
 
@@ -109,17 +108,20 @@ router.get('/customers/:id', authenticateToken, requireRole('admin', 'staff'), (
 
     customer.account_id = getHashedAccountNumber(customer.id, customer.email);
 
+    // Plans have no product link; a subscription's product comes from its first line.
     const subscriptions = db.prepare(`
-      SELECT s.*, p.name as plan_name, pr.name as product_name
+      SELECT s.*, p.name as plan_name, p.billing_interval, p.price as plan_price,
+             (SELECT prod.name FROM subscription_lines sl
+                JOIN products prod ON sl.product_id = prod.id
+               WHERE sl.subscription_id = s.id ORDER BY sl.id LIMIT 1) as product_name
       FROM subscriptions s
       LEFT JOIN plans p ON s.plan_id = p.id
-      LEFT JOIN products pr ON p.product_id = pr.id
       WHERE s.customer_id = ?
       ORDER BY s.created_at DESC
     `).all(customer.id);
 
     const invoices = db.prepare(`
-      SELECT id, invoice_number, status, total_amount, issue_date, due_date
+      SELECT id, invoice_number, status, total_amount, amount_due, invoice_date, due_date
       FROM invoices
       WHERE customer_id = ?
       ORDER BY created_at DESC
@@ -197,7 +199,7 @@ router.put('/customers/:id', authenticateToken, requireRole('admin', 'staff'), (
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    const existing = db.prepare('SELECT id FROM users WHERE id = ? AND role = "customer"').get(req.params.id);
+    const existing = db.prepare("SELECT id FROM users WHERE id = ? AND role = 'customer'").get(req.params.id);
     if (!existing) {
       return res.status(404).json({ error: 'Customer not found' });
     }

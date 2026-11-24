@@ -136,10 +136,33 @@ router.put('/:id', authenticateToken, requireRole('admin'), (req, res) => {
       allow_renewal
     } = req.body;
 
-    const existing = db.prepare('SELECT id FROM plans WHERE id = ?').get(planId);
+    const existing = db.prepare('SELECT * FROM plans WHERE id = ?').get(planId);
     if (!existing) {
       return res.status(404).json({ error: 'Plan not found' });
     }
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Plan name is required' });
+    }
+    if (!code || !code.trim()) {
+      return res.status(400).json({ error: 'Plan code is required' });
+    }
+
+    const validIntervals = ['daily', 'weekly', 'monthly', 'yearly'];
+    if (!validIntervals.includes(billing_interval)) {
+      return res.status(400).json({
+        error: `Invalid billing interval. Must be one of: [${validIntervals.join(', ')}]`
+      });
+    }
+
+    const cleanCode = code.trim().toUpperCase();
+    const duplicate = db.prepare('SELECT id FROM plans WHERE code = ? AND id != ?').get(cleanCode, planId);
+    if (duplicate) {
+      return res.status(409).json({ field: 'code', error: 'A plan with this code already exists' });
+    }
+
+    // Flags left out of the request keep their current value instead of being reset.
+    const flag = (value, current) => (value === undefined ? current : (value ? 1 : 0));
 
     const update = db.prepare(`
       UPDATE plans
@@ -151,16 +174,16 @@ router.put('/:id', authenticateToken, requireRole('admin'), (req, res) => {
 
     update.run(
       name.trim(),
-      code.trim().toUpperCase(),
+      cleanCode,
       parseFloat(price) || 0,
       billing_interval,
       parseInt(min_quantity, 10) || 1,
       available_from || null,
       available_until || null,
-      auto_close_on_end ? 1 : 0,
-      allow_early_close ? 1 : 0,
-      allow_pause ? 1 : 0,
-      allow_renewal ? 1 : 0,
+      flag(auto_close_on_end, existing.auto_close_on_end),
+      flag(allow_early_close, existing.allow_early_close),
+      flag(allow_pause, existing.allow_pause),
+      flag(allow_renewal, existing.allow_renewal),
       planId
     );
 
