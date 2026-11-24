@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useAuth } from './context/AuthContext';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
@@ -26,7 +27,8 @@ import { tokens } from './theme';
 
 export default function App() {
   const { user, loading, isCustomer, isAdmin } = useAuth();
-  const [authView, setAuthView] = useState('login');
+  // Logged-out visitors see the landing page first; sign-in and register are one click away.
+  const [authView, setAuthView] = useState('landing');
   const [resetToken, setResetToken] = useState('');
   const [consoleView, setConsoleView] = useState('dashboard');
   // Stripe returns customers to /payment-return; open that page directly if the URL says so.
@@ -65,6 +67,8 @@ export default function App() {
         return <ForgotPasswordPage onNavigate={handleAuthNavigate} />;
       case 'reset-password':
         return <ResetPasswordPage onNavigate={handleAuthNavigate} initialToken={resetToken} />;
+      case 'landing':
+        return <LandingPage onNavigate={handleAuthNavigate} />;
       case 'login':
       default:
         return <LoginPage onNavigate={handleAuthNavigate} />;
