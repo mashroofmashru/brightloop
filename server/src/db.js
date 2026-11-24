@@ -195,6 +195,19 @@ export function initDb() {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
+    -- One row per hosted-checkout attempt. Lets a payment be recorded exactly once,
+    -- whether it arrives via the return page or the Stripe webhook.
+    CREATE TABLE IF NOT EXISTS payment_sessions (
+      session_id TEXT PRIMARY KEY,
+      invoice_id INTEGER NOT NULL REFERENCES invoices(id),
+      customer_id INTEGER NOT NULL REFERENCES users(id),
+      amount REAL NOT NULL,
+      currency TEXT NOT NULL DEFAULT 'usd',
+      status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'failed')),
+      payment_id INTEGER REFERENCES payments(id),
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
     -- Indexes for sub-2s query SLA
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);

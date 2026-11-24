@@ -5,7 +5,7 @@ import { authenticateToken, requireRole } from '../middleware/auth.js';
 const router = express.Router();
 
 // Helper: Generate next payment number (PAY-YYYY-XXXX)
-function generatePaymentNumber() {
+export function generatePaymentNumber() {
   const year = new Date().getFullYear();
   const lastPay = db.prepare(`
     SELECT payment_number FROM payments
@@ -73,7 +73,8 @@ router.get('/', authenticateToken, (req, res) => {
 // POST /api/payments (Record a payment against an invoice)
 // "Payments arrive by different methods and on different days.
 //  Each one needs to be recorded with its method, amount, date and a note, against the right invoice."
-router.post('/', authenticateToken, (req, res) => {
+// Staff record offline receipts (cash, cheque, bank transfer). Customers pay through the gateway instead.
+router.post('/', authenticateToken, requireRole('admin', 'staff'), (req, res) => {
   try {
     const {
       invoice_id,

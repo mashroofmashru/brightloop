@@ -18,7 +18,7 @@ import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
-import { subscriptionsApi, invoicesApi, paymentsApi } from '../api';
+import { subscriptionsApi, invoicesApi, startOnlinePayment } from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 import LifecycleStepper from '../components/LifecycleStepper';
@@ -82,20 +82,10 @@ export default function CustomerPortalPage({ onNavigate }) {
   const handlePayInvoice = async (inv) => {
     try {
       setPayingInvoice(true);
-      await paymentsApi.record({
-        invoice_id: inv.id,
-        method: 'credit_card',
-        amount: inv.amount_due,
-        payment_date: new Date().toISOString().split('T')[0],
-        reference_note: 'Online payment via Customer Self-Service Portal'
-      });
-      setSuccessToast(`Invoice ${inv.invoice_number} paid successfully.`);
-      const refreshed = await invoicesApi.getById(inv.id);
-      setActiveInvoice(refreshed.invoice);
-      fetchPortalData();
+      // Redirects to Stripe's secure payment page; the return page records the payment.
+      await startOnlinePayment(inv.id);
     } catch (err) {
-      setErrorMsg(err.message || 'Payment settlement failed');
-    } finally {
+      setErrorMsg(err.message || 'Could not start the online payment');
       setPayingInvoice(false);
     }
   };

@@ -101,6 +101,18 @@ npm run seed
 > Starting the server does **not** reset data. It only seeds when the database is empty.
 > `npm test` runs against a temporary database, so it never changes `brightloop.db`.
 
+### Online card payments (Stripe)
+Customers pay open invoices on Stripe's hosted checkout page. Configure these server environment variables (use test keys while developing):
+
+| Variable | Purpose |
+|---|---|
+| `STRIPE_SECRET_KEY` | `sk_test_...` secret key. Without it, online payment returns an error. |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_...` for the webhook at `/api/gateway/webhook` (use the Stripe CLI locally: `stripe listen --forward-to localhost:5000/api/gateway/webhook`). |
+| `APP_URL` | Where Stripe sends the customer back. Default `http://localhost:3000`. |
+| `STRIPE_CURRENCY` | Default `usd`. |
+
+Staff still record offline receipts (cash, cheque, bank transfer) from the Payments page.
+
 ### 4. Run the Development Platform
 Run both the backend API and frontend client in separate terminals:
 

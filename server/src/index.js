@@ -13,6 +13,7 @@ import discountRoutes from './routes/discounts.js';
 import invoiceRoutes from './routes/invoices.js';
 import paymentRoutes from './routes/payments.js';
 import analyticsRoutes from './routes/analytics.js';
+import gatewayRoutes, { gatewayWebhook } from './routes/gateway.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +24,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+// Stripe webhook needs the raw body to verify its signature, so it goes before express.json().
+app.post('/api/gateway/webhook', express.raw({ type: 'application/json' }), gatewayWebhook);
 app.use(express.json());
 
 // Routes
@@ -37,6 +40,7 @@ app.use('/api/discounts', discountRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/gateway', gatewayRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

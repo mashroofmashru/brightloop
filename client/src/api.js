@@ -195,6 +195,23 @@ export const paymentsApi = {
   })
 };
 
+export const gatewayApi = {
+  checkout: (invoice_id) => apiRequest('/gateway/checkout', {
+    method: 'POST',
+    body: JSON.stringify({ invoice_id })
+  }),
+  confirm: (session_id) => apiRequest('/gateway/confirm', {
+    method: 'POST',
+    body: JSON.stringify({ session_id })
+  })
+};
+
+// Sends the customer to Stripe's hosted payment page. Stripe brings them back to /payment-return.
+export async function startOnlinePayment(invoiceId) {
+  const { url } = await gatewayApi.checkout(invoiceId);
+  window.location.href = url;
+}
+
 export const analyticsApi = {
   getDashboard: () => apiRequest('/analytics/dashboard')
 };

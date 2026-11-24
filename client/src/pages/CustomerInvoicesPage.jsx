@@ -14,7 +14,7 @@ import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import MonetizationOnRoundedIcon from '@mui/icons-material/MonetizationOnRounded';
 import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
-import { invoicesApi, paymentsApi } from '../api';
+import { invoicesApi, startOnlinePayment } from '../api';
 import { useAuth } from '../context/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 import { tokens } from '../theme';
@@ -65,23 +65,10 @@ export default function CustomerInvoicesPage({ onNavigate }) {
     if (!activeInvoice) return;
     try {
       setPayingInvoice(true);
-      await paymentsApi.record({
-        invoice_id: activeInvoice.id,
-        method: 'credit_card',
-        amount: activeInvoice.amount_due,
-        payment_date: new Date().toISOString().split('T')[0],
-        reference_note: 'Online settlement via Customer Self-Service Portal'
-      });
-      setSuccessToast(`Invoice ${activeInvoice.invoice_number} successfully paid in full!`);
-      setPayConfirmOpen(false);
-
-      // Refresh both modal view and full list
-      const refreshed = await invoicesApi.getById(activeInvoice.id);
-      setActiveInvoice(refreshed.invoice);
-      fetchInvoices();
+      // Redirects to Stripe's secure payment page; the return page records the payment.
+      await startOnlinePayment(activeInvoice.id);
     } catch (err) {
-      setErrorMsg(err.message || 'Payment settlement failed. Please try again.');
-    } finally {
+      setErrorMsg(err.message || 'Could not start the online payment. Please try again.');
       setPayingInvoice(false);
     }
   };
@@ -494,7 +481,7 @@ export default function CustomerInvoicesPage({ onNavigate }) {
             </Box>
 
             <Typography variant="caption" sx={{ color: tokens.muted, display: 'block', mb: 3 }}>
-              Payment method: <strong>Corporate Card ending in 4242</strong>. A receipt will be recorded automatically under your account.
+              You will be taken to Stripe's secure payment page to pay by card. Your invoice is updated automatically once payment is confirmed.
             </Typography>
 
             <Stack direction="row" spacing={1.5} justifyContent="flex-end">

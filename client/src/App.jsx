@@ -21,6 +21,7 @@ import ReportsPage from './pages/ReportsPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
 import CustomerInvoicesPage from './pages/CustomerInvoicesPage';
 import CustomerProfilePage from './pages/CustomerProfilePage';
+import PaymentReturnPage from './pages/PaymentReturnPage';
 import { tokens } from './theme';
 
 export default function App() {
@@ -28,7 +29,10 @@ export default function App() {
   const [authView, setAuthView] = useState('login');
   const [resetToken, setResetToken] = useState('');
   const [consoleView, setConsoleView] = useState('dashboard');
-  const [customerView, setCustomerView] = useState('portal-subscriptions');
+  // Stripe returns customers to /payment-return; open that page directly if the URL says so.
+  const [customerView, setCustomerView] = useState(() =>
+    window.location.pathname === '/payment-return' ? 'payment-return' : 'portal-subscriptions'
+  );
   const [templateToUse, setTemplateToUse] = useState(null);
 
   if (loading) {
@@ -75,6 +79,8 @@ export default function App() {
           return <CustomerInvoicesPage onNavigate={setCustomerView} />;
         case 'portal-profile':
           return <CustomerProfilePage onNavigate={setCustomerView} />;
+        case 'payment-return':
+          return <PaymentReturnPage onNavigate={setCustomerView} />;
         case 'portal-subscriptions':
         default:
           return <CustomerPortalPage onNavigate={setCustomerView} />;
